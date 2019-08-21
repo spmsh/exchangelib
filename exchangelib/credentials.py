@@ -49,7 +49,10 @@ class Credentials(PickleMixIn):
         self.password = password
 
     def __eq__(self, other):
-        return self.username == other.username and self.password == other.password
+        for k in self.__slots__:
+            if getattr(self, k) != getattr(other, k):
+                return False
+        return True
 
     def __hash__(self):
         return hash((self.username, self.password))
@@ -59,3 +62,29 @@ class Credentials(PickleMixIn):
 
     def __str__(self):
         return self.username
+
+
+class OAuth2Credentials(PickleMixIn):
+    """Login info for OAuth 2.0 authentication
+    """
+    __slots__ = ('client_id', 'client_secret', 'tenant_id')
+
+    def __init__(self, client_id, client_secret, tenant_id):
+        self.client_id = client_id
+        self.client_secret = client_secret
+        self.tenant_id = tenant_id
+
+    def __eq__(self, other):
+        for k in self.__slots__:
+            if getattr(self, k) != getattr(other, k):
+                return False
+        return True
+
+    def __hash__(self):
+        return hash((self.client_id, self.client_secret, self.tenant_id))
+
+    def __repr__(self):
+        return self.__class__.__name__ + repr((self.client_id, '********'))
+
+    def __str__(self):
+        return self.client_id
