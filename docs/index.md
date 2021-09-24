@@ -290,7 +290,7 @@ credentials = OAuth2AuthorizationCodeCredentials(
 )
 credentials = OAuth2AuthorizationCodeCredentials(
     client_id='MY_ID', client_secret='MY_SECRET',
-  access_token=OAuth2Token(access_token='EXISTING_TOKEN')
+  access_token=OAuth2Token({'access_token':'EXISTING_TOKEN'})
 )
 config = Configuration(credentials=credentials, auth_type=OAUTH2)
 
