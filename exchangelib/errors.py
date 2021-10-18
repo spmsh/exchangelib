@@ -127,6 +127,12 @@ class ResponseMessageError(TransportError):
     pass
 
 
+class SubscriptionMessageError(ResponseMessageError):
+    def __init__(self, *args, **kwargs):
+        self.subscription_ids = kwargs.pop('subscription_ids', None)
+        super().__init__(*args, **kwargs)
+
+
 class CASError(EWSError):
     """EWS will sometimes return an error message in an 'X-CasErrorCode' custom HTTP header in an HTTP 500 error code.
     This exception is for those cases. The caller may want to do something with the original response, so store that.
@@ -235,8 +241,8 @@ class ErrorEmailAddressMismatch(ResponseMessageError): pass
 class ErrorEventNotFound(ResponseMessageError): pass
 class ErrorExceededConnectionCount(ResponseMessageError): pass
 class ErrorExceededFindCountLimit(ResponseMessageError): pass
-class ErrorExceededSubscriptionCount(ResponseMessageError): pass
-class ErrorExpiredSubscription(ResponseMessageError): pass
+class ErrorExceededSubscriptionCount(SubscriptionMessageError): pass
+class ErrorExpiredSubscription(SubscriptionMessageError): pass
 class ErrorFolderCorrupt(ResponseMessageError): pass
 class ErrorFolderExists(ResponseMessageError): pass
 class ErrorFolderNotFound(ResponseMessageError): pass
@@ -331,8 +337,8 @@ class ErrorInvalidPropertyRequest(ResponseMessageError): pass
 class ErrorInvalidPropertySet(ResponseMessageError): pass
 class ErrorInvalidPropertyUpdateSentMessage(ResponseMessageError): pass
 class ErrorInvalidProxySecurityContext(ResponseMessageError): pass
-class ErrorInvalidPullSubscriptionId(ResponseMessageError): pass
-class ErrorInvalidPushSubscriptionUrl(ResponseMessageError): pass
+class ErrorInvalidPullSubscriptionId(SubscriptionMessageError): pass
+class ErrorInvalidPushSubscriptionUrl(SubscriptionMessageError): pass
 class ErrorInvalidRecipients(ResponseMessageError): pass
 class ErrorInvalidRecipientSubfilter(ResponseMessageError): pass
 class ErrorInvalidRecipientSubfilterComparison(ResponseMessageError): pass
@@ -356,8 +362,8 @@ class ErrorInvalidSmtpAddress(ResponseMessageError): pass
 class ErrorInvalidSubfilterType(ResponseMessageError): pass
 class ErrorInvalidSubfilterTypeNotAttendeeType(ResponseMessageError): pass
 class ErrorInvalidSubfilterTypeNotRecipientType(ResponseMessageError): pass
-class ErrorInvalidSubscription(ResponseMessageError): pass
-class ErrorInvalidSubscriptionRequest(ResponseMessageError): pass
+class ErrorInvalidSubscription(SubscriptionMessageError): pass
+class ErrorInvalidSubscriptionRequest(SubscriptionMessageError): pass
 class ErrorInvalidSyncStateData(ResponseMessageError): pass
 class ErrorInvalidTimeInterval(ResponseMessageError): pass
 class ErrorInvalidUserInfo(ResponseMessageError): pass
@@ -447,7 +453,7 @@ class ErrorPermissionNotAllowedByPolicy(ResponseMessageError): pass
 class ErrorPhoneNumberNotDialable(ResponseMessageError): pass
 class ErrorPropertyUpdate(ResponseMessageError): pass
 class ErrorPropertyValidationFailure(ResponseMessageError): pass
-class ErrorProxiedSubscriptionCallFailure(ResponseMessageError): pass
+class ErrorProxiedSubscriptionCallFailure(SubscriptionMessageError): pass
 class ErrorProxyCallFailed(ResponseMessageError): pass
 class ErrorProxyGroupSidLimitExceeded(ResponseMessageError): pass
 class ErrorProxyRequestNotAllowed(ResponseMessageError): pass
@@ -495,10 +501,10 @@ class ErrorSharingNoExternalEwsAvailable(ResponseMessageError): pass
 class ErrorSharingSynchronizationFailed(ResponseMessageError): pass
 class ErrorStaleObject(ResponseMessageError): pass
 class ErrorSubmissionQuotaExceeded(ResponseMessageError): pass
-class ErrorSubscriptionAccessDenied(ResponseMessageError): pass
-class ErrorSubscriptionDelegateAccessNotSupported(ResponseMessageError): pass
-class ErrorSubscriptionNotFound(ResponseMessageError): pass
-class ErrorSubscriptionUnsubsribed(ResponseMessageError): pass
+class ErrorSubscriptionAccessDenied(SubscriptionMessageError): pass
+class ErrorSubscriptionDelegateAccessNotSupported(SubscriptionMessageError): pass
+class ErrorSubscriptionNotFound(SubscriptionMessageError): pass
+class ErrorSubscriptionUnsubscribed(SubscriptionMessageError): pass
 class ErrorSyncFolderNotFound(ResponseMessageError): pass
 class ErrorTimeIntervalTooBig(ResponseMessageError): pass
 class ErrorTimeoutExpired(ResponseMessageError): pass

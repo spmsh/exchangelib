@@ -1,8 +1,10 @@
 import logging
+import importlib
 
 from .common import EWSAccountService, add_xml_child
 from ..properties import Notification
 from ..util import create_element, get_xml_attr, get_xml_attrs, MNS, DocumentYielder, DummyResponse
+from ..errors import ErrorInvalidSubscription
 
 log = logging.getLogger(__name__)
 xml_log = logging.getLogger('%s.xml' % __name__)
@@ -27,6 +29,8 @@ class GetStreamingEvents(EWSAccountService):
         self.connection_status = None
         self.error_subscription_ids = []
         super().__init__(*args, **kwargs)
+        self.streaming = GetStreamingEvents.streaming
+        self.prefer_affinity = GetStreamingEvents.prefer_affinity
 
     def call(self, subscription_ids, connection_timeout):
         if connection_timeout < 1:
@@ -70,8 +74,15 @@ class GetStreamingEvents(EWSAccountService):
     def _get_element_container(self, message, name=None):
         error_ids_elem = message.find('{%s}ErrorSubscriptionIds' % MNS)
         if error_ids_elem is not None:
-            self.error_subscription_ids = get_xml_attrs(error_ids_elem, '{%s}ErrorSubscriptionId' % MNS)
-            log.debug('These subscription IDs are invalid: %s', self.error_subscription_ids)
+            self.error_subscription_ids = get_xml_attrs(error_ids_elem, '{%s}SubscriptionId' % MNS)
+            response_class = message.get('ResponseClass')
+            response_code = get_xml_attr(message, '{%s}ResponseCode' % MNS)
+            if response_class == 'Error':
+                msg_text = get_xml_attr(message, '{%s}MessageText' % MNS)
+                log.debug('%s %s' % (msg_text, self.error_subscription_ids))
+                _error_module = importlib.import_module("exchangelib.errors")
+                _error_class = getattr(_error_module, response_code)
+                raise _error_class('%s %s' % (msg_text, self.error_subscription_ids), subscription_ids=self.error_subscription_ids)
         self.connection_status = get_xml_attr(message, '{%s}ConnectionStatus' % MNS)  # Either 'OK' or 'Closed'
         log.debug('Connection status is: %s', self.connection_status)
         # Upstream expects to find a 'name' tag but our response does not always have it. Return an empty element.

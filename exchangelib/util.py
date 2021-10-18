@@ -250,7 +250,7 @@ def set_xml_value(elem, value, version):
             elif isinstance(v, _element_class):
                 elem.append(v)
             elif isinstance(v, str):
-                add_xml_child(elem, 't:String', v)
+                elem.text = v
             else:
                 raise ValueError('Unsupported type %s for list element %s on elem %s' % (type(v), v, elem))
     elif isinstance(value, (FieldPath, FieldOrder)):

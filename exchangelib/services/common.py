@@ -18,7 +18,10 @@ from ..errors import EWSWarning, TransportError, SOAPError, ErrorTimeoutExpired,
     SessionPoolMinSizeReached, ErrorIncorrectSchemaVersion, ErrorInvalidRequest, ErrorCorruptData, \
     ErrorCannotEmptyFolder, ErrorDeleteDistinguishedFolder, ErrorInvalidSubscription, ErrorInvalidWatermark, \
     ErrorInvalidSyncStateData, ErrorNameResolutionNoResults, ErrorNameResolutionMultipleResults, \
-    ErrorConnectionFailedTransientError
+    ErrorConnectionFailedTransientError, ErrorExceededSubscriptionCount, ErrorExpiredSubscription, \
+    ErrorInvalidPullSubscriptionId, ErrorInvalidPushSubscriptionUrl, ErrorInvalidSubscription, \
+    ErrorInvalidSubscriptionRequest, ErrorProxiedSubscriptionCallFailure, ErrorSubscriptionAccessDenied, \
+    ErrorSubscriptionDelegateAccessNotSupported, ErrorSubscriptionNotFound, ErrorSubscriptionUnsubscribed
 from ..properties import FieldURI, IndexedFieldURI, ExtendedFieldURI, ExceptionFieldURI, ItemId
 from ..transport import wrap
 from ..util import chunkify, create_element, add_xml_child, get_xml_attr, to_xml, post_ratelimited, \
@@ -40,6 +43,8 @@ KNOWN_EXCEPTIONS = (
     ErrorCreateItemAccessDenied,
     ErrorDeleteDistinguishedFolder,
     ErrorExceededConnectionCount,
+    ErrorExceededSubscriptionCount,
+    ErrorExpiredSubscription,
     ErrorFolderNotFound,
     ErrorImpersonateUserDenied,
     ErrorImpersonationFailed,
@@ -47,7 +52,10 @@ KNOWN_EXCEPTIONS = (
     ErrorInternalServerTransientError,
     ErrorInvalidChangeKey,
     ErrorInvalidLicense,
+    ErrorInvalidPullSubscriptionId,
+    ErrorInvalidPushSubscriptionUrl,
     ErrorInvalidSubscription,
+    ErrorInvalidSubscriptionRequest,
     ErrorInvalidSyncStateData,
     ErrorInvalidWatermark,
     ErrorItemNotFound,
@@ -58,7 +66,12 @@ KNOWN_EXCEPTIONS = (
     ErrorNonExistentMailbox,
     ErrorNoPublicFolderReplicaAvailable,
     ErrorNoRespondingCASInDestinationSite,
+    ErrorProxiedSubscriptionCallFailure,
     ErrorQuotaExceeded,
+    ErrorSubscriptionAccessDenied,
+    ErrorSubscriptionDelegateAccessNotSupported,
+    ErrorSubscriptionNotFound,
+    ErrorSubscriptionUnsubscribed,
     ErrorTimeoutExpired,
     RateLimitError,
     UnauthorizedError,
@@ -172,11 +185,12 @@ class EWSService(metaclass=abc.ABCMeta):
 
     def _extra_headers(self, session):
         headers = {}
-        if self.prefer_affinity:
+        if self.prefer_affinity or hasattr(self.account, "backend_affinity"):
+            # https://docs.microsoft.com/en-us/exchange/client-developer/exchange-web-services/how-to-maintain-affinity-between-group-of-subscriptions-and-mailbox-server
             headers['X-PreferServerAffinity'] = 'True'
-        for cookie in session.cookies:
-            if cookie.name == 'X-BackEndCookie':
-                headers['X-BackEndOverrideCookie'] = cookie.value
+            if 'X-BackEndOverrideCookie' not in session.cookies:
+                if hasattr(self.account, "backend_affinity"):
+                    session.cookies["X-BackEndOverrideCookie"] = self.account.backend_affinity
         return headers
 
     @property
@@ -310,6 +324,13 @@ class EWSService(metaclass=abc.ABCMeta):
         for api_version in self._api_versions_to_try:
             log.debug('Trying API version %s', api_version)
             r = self._get_response(payload=payload, api_version=api_version)
+
+            # save the BackEndOverrideCookie on a subscription request
+            if 'x-EwsHandler' in r.headers and r.headers['x-EwsHandler'] == 'Subscribe':
+                for cookie in r.cookies:
+                    if cookie.name == 'X-BackEndOverrideCookie':
+                        self.account.backend_affinity = cookie.value
+
             if self.streaming:
                 # Let 'requests' decode raw data automatically
                 r.raw.decode_content = True

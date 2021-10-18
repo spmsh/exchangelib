@@ -680,7 +680,7 @@ class BaseFolder(RegisterMixIn, SearchableMixIn, metaclass=EWSMeta):
                 svc.stop_streaming()
                 break
         if svc.error_subscription_ids:
-            raise ErrorInvalidSubscription('Invalid subscription IDs: %s' % svc.error_subscription_ids)
+            raise SubscriptionMessageError('Invalid subscription IDs: %s' % svc.error_subscription_ids)
 
     def __floordiv__(self, other):
         """Support the some_folder // 'child_folder' // 'child_of_child_folder' navigation syntax.

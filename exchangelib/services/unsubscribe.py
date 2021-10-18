@@ -9,6 +9,7 @@ class Unsubscribe(EWSAccountService):
     """
 
     SERVICE_NAME = 'Unsubscribe'
+    prefer_affinity = True
     returns_elements = False
 
     def call(self, subscription_id):

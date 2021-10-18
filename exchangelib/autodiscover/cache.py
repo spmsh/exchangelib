@@ -101,9 +101,13 @@ class AutodiscoverCache:
             return protocol
         domain, credentials = key
         with shelve_open_with_failover(self._storage_file) as db:
-            endpoint, auth_type, retry_policy = db[str(domain)]  # It's OK to fail with KeyError here
+            endpoint, auth_type, retry_policy, max_connections = db[str(domain)]  # It's OK to fail with KeyError here
         protocol = AutodiscoverProtocol(config=Configuration(
-            service_endpoint=endpoint, credentials=credentials, auth_type=auth_type, retry_policy=retry_policy
+            max_connections=max_connections,
+            service_endpoint=endpoint,
+            credentials=credentials,
+            auth_type=auth_type,
+            retry_policy=retry_policy
         ))
         self._protocols[key] = protocol
         return protocol
@@ -113,7 +117,7 @@ class AutodiscoverCache:
         domain = key[0]
         with shelve_open_with_failover(self._storage_file) as db:
             # Don't change this payload without bumping the cache file version in shelve_filename()
-            db[str(domain)] = (protocol.service_endpoint, protocol.auth_type, protocol.retry_policy)
+            db[str(domain)] = (protocol.service_endpoint, protocol.auth_type, protocol.retry_policy, protocol.config.max_connections)
         self._protocols[key] = protocol
 
     def __delitem__(self, key):

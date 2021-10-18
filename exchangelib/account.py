@@ -116,7 +116,7 @@ class Account:
             else:
                 retry_policy, auth_type = None, None
             self.ad_response, self.protocol = discover(
-                email=primary_smtp_address, credentials=credentials, auth_type=auth_type, retry_policy=retry_policy
+                email=primary_smtp_address, credentials=credentials, auth_type=auth_type, retry_policy=retry_policy, max_connections=config.max_connections
             )
             primary_smtp_address = self.ad_response.autodiscover_smtp_address
         else:

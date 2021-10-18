@@ -48,7 +48,7 @@ class BaseProtocol:
     CONNECTIONS_PER_SESSION = 1
     # The number of times a session may be reused before creating a new session object. 'None' means "infinite".
     # Discarding sessions after a certain number of usages may limit memory leaks in the Session object.
-    MAX_SESSION_USAGE_COUNT = None
+    MAX_SESSION_USAGE_COUNT = 1
     # Timeout for HTTP requests
     TIMEOUT = 120
 
@@ -66,8 +66,7 @@ class BaseProtocol:
             raise AttributeError("'config.service_endpoint' must be set")
         self.config = config
         self._session_pool_size = 0
-        self._session_pool_maxsize = config.max_connections or self.SESSION_POOLSIZE
-
+        self._session_pool_maxsize = config.max_connections if config.max_connections is not None else self.SESSION_POOLSIZE
         # Try to behave nicely with the remote server. We want to keep the connection open between requests.
         # We also want to re-use sessions, to avoid the NTLM auth handshake on every request. We must know the
         # authentication method to create sessions.
@@ -151,10 +150,10 @@ class BaseProtocol:
         """Increases the session pool size. We increase by one session per call."""
         # Create a single session and insert it into the pool. We need to protect this with a lock while we are changing
         # the pool size variable, to avoid race conditions. We must not exceed the pool size limit.
-        if self._session_pool_size == self._session_pool_maxsize:
-            raise SessionPoolMaxSizeReached('Session pool size cannot be increased further')
+        if self._session_pool_maxsize > 0 and self._session_pool_size == self._session_pool_maxsize:
+                raise SessionPoolMaxSizeReached('Session pool size cannot be increased further')
         with self._session_pool_lock:
-            if self._session_pool_size >= self._session_pool_maxsize:
+            if self._session_pool_maxsize > 0 and self._session_pool_size >= self._session_pool_maxsize:
                 log.debug('Session pool size was increased in another thread')
                 return
             log.debug('Server %s: Increasing session pool size from %s to %s', self.server, self._session_pool_size,
@@ -183,6 +182,15 @@ class BaseProtocol:
     def get_session(self):
         # Try to get a session from the queue. If the queue is empty, try to add one more session to the queue. If the
         # queue is already at its max, wait until a session becomes available.
+
+        # add unlimited session
+        if self._session_pool_maxsize == 0:
+            self.increase_poolsize()
+            session = self._session_pool.get()
+            log.debug('Server %s: Got session %s - %s', self.server, session.session_id, self._session_pool_size)
+            session.usage_count += 1
+            return session
+
         _timeout = 60  # Rate-limit messages about session starvation
         try:
             session = self._session_pool.get(block=False)
@@ -207,8 +215,9 @@ class BaseProtocol:
     def release_session(self, session):
         # This should never fail, as we don't have more sessions than the queue contains
         log.debug('Server %s: Releasing session %s', self.server, session.session_id)
-        if self.MAX_SESSION_USAGE_COUNT and session.usage_count > self.MAX_SESSION_USAGE_COUNT:
+        if self.MAX_SESSION_USAGE_COUNT and session.usage_count >= self.MAX_SESSION_USAGE_COUNT:
             log.debug('Server %s: session %s usage exceeded limit. Discarding', self.server, session.session_id)
+            self._session_pool_size -= 1
             session = self.renew_session(session)
         try:
             self._session_pool.put(session, block=False)

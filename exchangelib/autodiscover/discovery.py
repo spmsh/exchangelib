@@ -21,9 +21,9 @@ from ..version import Version
 log = logging.getLogger(__name__)
 
 
-def discover(email, credentials=None, auth_type=None, retry_policy=None):
+def discover(email, credentials=None, auth_type=None, retry_policy=None, max_connections=None):
     return Autodiscovery(
-        email=email, credentials=credentials, auth_type=auth_type, retry_policy=retry_policy
+        email=email, credentials=credentials, auth_type=auth_type, retry_policy=retry_policy, max_connections=max_connections
     ).discover()
 
 
@@ -80,7 +80,7 @@ class Autodiscovery:
         'timeout': AutodiscoverProtocol.TIMEOUT,
     }
 
-    def __init__(self, email, credentials=None, auth_type=None, retry_policy=None):
+    def __init__(self, email, credentials=None, auth_type=None, retry_policy=None, max_connections=None):
         """
 
         :param email: The email address to autodiscover
@@ -93,6 +93,7 @@ class Autodiscovery:
         self.credentials = credentials
         self.auth_type = auth_type  # The auth type that the resulting protocol instance should have
         self.retry_policy = retry_policy  # The retry policy that the resulting protocol instance should have
+        self.max_connections = max_connections
         self._urls_visited = []  # Collects HTTP and Autodiscover redirects
         self._redirect_count = 0
         self._emails_visited = []  # Collects Autodiscover email redirects
@@ -176,6 +177,7 @@ class Autodiscovery:
         # We may not want to use the auth_package hints in the AD response. It could be incorrect and we can just guess.
         protocol = Protocol(
             config=Configuration(
+                max_connections=self.max_connections,
                 service_endpoint=ews_url,
                 credentials=self.credentials,
                 version=version,
@@ -340,6 +342,7 @@ class Autodiscovery:
                 raise ValueError('Auth type %r was detected but no credentials were provided' % auth_type)
             ad_protocol = AutodiscoverProtocol(
                 config=Configuration(
+                    max_connections=self.max_connections,
                     service_endpoint=url,
                     credentials=self.credentials,
                     auth_type=auth_type,
