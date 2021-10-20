@@ -1,5 +1,5 @@
 import logging
-from multiprocessing import Lock
+from threading import Lock
 
 from .base import BaseFolder, MISSING_FOLDER_ERRORS
 from .collections import FolderCollection
