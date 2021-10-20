@@ -421,7 +421,7 @@ class ErrorMoveDistinguishedFolder(ResponseMessageError): pass
 class ErrorNameResolutionMultipleResults(ResponseMessageError): pass
 class ErrorNameResolutionNoMailbox(ResponseMessageError): pass
 class ErrorNameResolutionNoResults(ResponseMessageError): pass
-class ErrorNewEventStreamConnectionOpened(ResponseMessageError): pass
+class ErrorNewEventStreamConnectionOpened(SubscriptionMessageError): pass
 class ErrorNoApplicableProxyCASServersAvailable(ResponseMessageError): pass
 class ErrorNoCalendar(ResponseMessageError): pass
 class ErrorNoDestinationCASDueToKerberosRequirements(ResponseMessageError): pass
