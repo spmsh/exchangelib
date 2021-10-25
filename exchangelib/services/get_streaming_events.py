@@ -4,7 +4,7 @@ import importlib
 from .common import EWSAccountService, add_xml_child
 from ..properties import Notification
 from ..util import create_element, get_xml_attr, get_xml_attrs, MNS, DocumentYielder, DummyResponse
-from ..errors import ErrorInvalidSubscription
+from ..errors import SubscriptionMessageError, ERRORS_NOTIFICATIONS_RELATED
 
 log = logging.getLogger(__name__)
 xml_log = logging.getLogger('%s.xml' % __name__)
@@ -82,7 +82,9 @@ class GetStreamingEvents(EWSAccountService):
                 log.debug('%s %s' % (msg_text, self.error_subscription_ids))
                 _error_module = importlib.import_module("exchangelib.errors")
                 _error_class = getattr(_error_module, response_code)
-                raise _error_class('%s %s' % (msg_text, self.error_subscription_ids), subscription_ids=self.error_subscription_ids)
+                if _error_class in ERRORS_NOTIFICATIONS_RELATED and self.error_subscription_ids:
+                    raise _error_class('%s %s' % (msg_text, self.error_subscription_ids), subscription_ids=self.error_subscription_ids)
+                raise SubscriptionMessageError('%s: %s %s' % (response_code, msg_text, self.error_subscription_ids))
         self.connection_status = get_xml_attr(message, '{%s}ConnectionStatus' % MNS)  # Either 'OK' or 'Closed'
         log.debug('Connection status is: %s', self.connection_status)
         # Upstream expects to find a 'name' tag but our response does not always have it. Return an empty element.

@@ -150,7 +150,7 @@ class CASError(EWSError):
 # Somewhat-authoritative list of possible response message error types from EWS. See full list at
 # https://docs.microsoft.com/en-us/exchange/client-developer/web-service-reference/responsecode
 #
-class ErrorAccessDenied(ResponseMessageError): pass
+class ErrorAccessDenied(SubscriptionMessageError): pass
 class ErrorAccessModeSpecified(ResponseMessageError): pass
 class ErrorAccountDisabled(ResponseMessageError): pass
 class ErrorAddDelegatesFailed(ResponseMessageError): pass
@@ -464,7 +464,7 @@ class ErrorPublicFolderRequestProcessingFailed(ResponseMessageError): pass
 class ErrorPublicFolderServerNotFound(ResponseMessageError): pass
 class ErrorQueryFilterTooLong(ResponseMessageError): pass
 class ErrorQuotaExceeded(ResponseMessageError): pass
-class ErrorReadEventsFailed(ResponseMessageError): pass
+class ErrorReadEventsFailed(SubscriptionMessageError): pass
 class ErrorReadReceiptNotPending(ResponseMessageError): pass
 class ErrorRecurrenceEndDateTooBig(ResponseMessageError): pass
 class ErrorRecurrenceHasNoOccurrence(ResponseMessageError): pass
@@ -555,9 +555,35 @@ ERRORS_REQUIRING_REAUTODISCOVER = (
     ErrorInvalidIdReturnedByResolveNames,
     ErrorInvalidNetworkServiceContext,
     ErrorMailboxMoveInProgress,
-    ErrorMailboxMoveInProgress,
     ErrorMailboxStoreUnavailable,
     ErrorNameResolutionNoMailbox,
     ErrorNameResolutionNoResults,
     ErrorNotEnoughMemory,
+)
+
+
+# https://docs.microsoft.com/en-us/exchange/client-developer/exchange-web-services/handling-notification-related-errors-in-ews-in-exchange
+ERRORS_NOTIFICATIONS_RELATED = (
+    ErrorExceededConnectionCount,
+    ErrorExceededSubscriptionCount,
+    ErrorInvalidSubscription,
+    ErrorInvalidSubscriptionRequest,
+    ErrorInvalidWatermark,
+    ErrorMissedNotificationEvents,
+    ErrorProxyRequestNotAllowed,
+    ErrorReadEventsFailed,
+    ErrorServerBusy,
+    # ServiceLocalException,
+    # ServiceResponseException,
+    # Plus some others which return a subscription id
+    ErrorAccessDenied,
+    ErrorExpiredSubscription,
+    ErrorInvalidPullSubscriptionId,
+    ErrorInvalidPushSubscriptionUrl,
+    ErrorNewEventStreamConnectionOpened,
+    ErrorProxiedSubscriptionCallFailure,
+    ErrorSubscriptionAccessDenied,
+    ErrorSubscriptionDelegateAccessNotSupported,
+    ErrorSubscriptionNotFound,
+    ErrorSubscriptionUnsubscribed,
 )

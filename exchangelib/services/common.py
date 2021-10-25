@@ -22,7 +22,8 @@ from ..errors import EWSWarning, TransportError, SOAPError, ErrorTimeoutExpired,
     ErrorInvalidPullSubscriptionId, ErrorInvalidPushSubscriptionUrl, ErrorInvalidSubscription, \
     ErrorInvalidSubscriptionRequest, ErrorProxiedSubscriptionCallFailure, ErrorSubscriptionAccessDenied, \
     ErrorSubscriptionDelegateAccessNotSupported, ErrorSubscriptionNotFound, ErrorSubscriptionUnsubscribed, \
-    ErrorNewEventStreamConnectionOpened
+    ErrorNewEventStreamConnectionOpened, ErrorReadEventsFailed, ErrorMissedNotificationEvents, \
+    ErrorProxyRequestNotAllowed
 from ..properties import FieldURI, IndexedFieldURI, ExtendedFieldURI, ExceptionFieldURI, ItemId
 from ..transport import wrap
 from ..util import chunkify, create_element, add_xml_child, get_xml_attr, to_xml, post_ratelimited, \
@@ -77,6 +78,10 @@ KNOWN_EXCEPTIONS = (
     ErrorTimeoutExpired,
     RateLimitError,
     UnauthorizedError,
+    ErrorReadEventsFailed,
+    ErrorMissedNotificationEvents,
+    ErrorProxyRequestNotAllowed,
+    ErrorServerBusy,
 )
 
 
