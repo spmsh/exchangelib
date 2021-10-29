@@ -3,7 +3,14 @@ Change Log
 
 HEAD
 ----
--   Support microsecond precision in `EWSDateTime.ewsformat()`
+
+
+4.6.0
+-----
+- Support microsecond precision in `EWSDateTime.ewsformat()`
+- Remove usage of the `multiprocessing` module to allow running in AWS Lambda
+- Support `tzlocal>=4`
+
 
 4.5.2
 -----

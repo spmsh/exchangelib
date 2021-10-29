@@ -120,9 +120,7 @@ class EWSDateTime(datetime.datetime):
         if not isinstance(tzinfo, (EWSTimeZone, type(None))):
             raise ValueError(&#39;tzinfo %r must be an EWSTimeZone instance&#39; % tzinfo)
         if len(args) == 8:
-            args = list(args)
-            args[7] = tzinfo
-            args = tuple(args)
+            args = args[:7] + (tzinfo,)
         else:
             kwargs[&#39;tzinfo&#39;] = tzinfo
         return super().__new__(cls, *args, **kwargs)
@@ -135,8 +133,10 @@ class EWSDateTime(datetime.datetime):
         if not self.tzinfo:
             raise ValueError(&#39;%r must be timezone-aware&#39; % self)
         if self.tzinfo.key == &#39;UTC&#39;:
+            if self.microsecond:
+                return self.strftime(&#39;%Y-%m-%dT%H:%M:%S.%fZ&#39;)
             return self.strftime(&#39;%Y-%m-%dT%H:%M:%SZ&#39;)
-        return self.replace(microsecond=0).isoformat()
+        return self.isoformat()
 
     @classmethod
     def from_datetime(cls, d):
@@ -303,6 +303,7 @@ class EWSTimeZone(zoneinfo.ZoneInfo):
                 &#39;dateutil&#39;: cls.from_dateutil,
                 &#39;pytz&#39;: cls.from_pytz,
                 &#39;zoneinfo&#39;: cls.from_zoneinfo,
+                &#39;pytz_deprecation_shim&#39;: lambda z: cls.from_zoneinfo(z.unwrap_shim())
             }[tz_module](tz)
         except KeyError:
             raise TypeError(&#39;Unsupported tzinfo type: %r&#39; % tz)
@@ -560,9 +561,7 @@ def fromordinal(cls, n):
         if not isinstance(tzinfo, (EWSTimeZone, type(None))):
             raise ValueError(&#39;tzinfo %r must be an EWSTimeZone instance&#39; % tzinfo)
         if len(args) == 8:
-            args = list(args)
-            args[7] = tzinfo
-            args = tuple(args)
+            args = args[:7] + (tzinfo,)
         else:
             kwargs[&#39;tzinfo&#39;] = tzinfo
         return super().__new__(cls, *args, **kwargs)
@@ -575,8 +574,10 @@ def fromordinal(cls, n):
         if not self.tzinfo:
             raise ValueError(&#39;%r must be timezone-aware&#39; % self)
         if self.tzinfo.key == &#39;UTC&#39;:
+            if self.microsecond:
+                return self.strftime(&#39;%Y-%m-%dT%H:%M:%S.%fZ&#39;)
             return self.strftime(&#39;%Y-%m-%dT%H:%M:%SZ&#39;)
-        return self.replace(microsecond=0).isoformat()
+        return self.isoformat()
 
     @classmethod
     def from_datetime(cls, d):
@@ -850,8 +851,10 @@ def utcnow(cls):
     if not self.tzinfo:
         raise ValueError(&#39;%r must be timezone-aware&#39; % self)
     if self.tzinfo.key == &#39;UTC&#39;:
+        if self.microsecond:
+            return self.strftime(&#39;%Y-%m-%dT%H:%M:%S.%fZ&#39;)
         return self.strftime(&#39;%Y-%m-%dT%H:%M:%SZ&#39;)
-    return self.replace(microsecond=0).isoformat()</code></pre>
+    return self.isoformat()</code></pre>
 </details>
 </dd>
 </dl>
@@ -941,6 +944,7 @@ services.GetServerTimeZones.</p></div>
                 &#39;dateutil&#39;: cls.from_dateutil,
                 &#39;pytz&#39;: cls.from_pytz,
                 &#39;zoneinfo&#39;: cls.from_zoneinfo,
+                &#39;pytz_deprecation_shim&#39;: lambda z: cls.from_zoneinfo(z.unwrap_shim())
             }[tz_module](tz)
         except KeyError:
             raise TypeError(&#39;Unsupported tzinfo type: %r&#39; % tz)
@@ -1082,6 +1086,7 @@ def from_timezone(cls, tz):
             &#39;dateutil&#39;: cls.from_dateutil,
             &#39;pytz&#39;: cls.from_pytz,
             &#39;zoneinfo&#39;: cls.from_zoneinfo,
+            &#39;pytz_deprecation_shim&#39;: lambda z: cls.from_zoneinfo(z.unwrap_shim())
         }[tz_module](tz)
     except KeyError:
         raise TypeError(&#39;Unsupported tzinfo type: %r&#39; % tz)</code></pre>

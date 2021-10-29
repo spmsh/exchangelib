@@ -524,6 +524,7 @@ number of folders, and you already know where to go.
 ```python
 some_folder // 'sub_folder' // 'even_deeper' // 'leaf'
 some_folder.parts  # returns some_folder and all parents, as Folder instances
+some_folder.absolute  # Returns the full path as a string
 ```
 
 tree() returns a string representation of the tree structure at a given level
@@ -662,14 +663,11 @@ ews_now = EWSDateTime.from_datetime(py_dt)
 ## Creating, updating, deleting, sending, moving, archiving, marking as junk
 
 Here's an example of creating a calendar item in the user's standard calendar.
-If you want to access a non-standard calendar, choose a different one from
-account.folders[Calendar].
-
-You can create, update and delete single items:
 
 ```python
 from exchangelib import Account, CalendarItem
-from exchangelib.items import SEND_ONLY_TO_ALL
+from exchangelib.items import SEND_ONLY_TO_ALL, SEND_ONLY_TO_CHANGED
+from exchangelib.properties import DistinguishedFolderId
 
 a = Account(...)
 item = CalendarItem(folder=a.calendar, subject='foo')
@@ -678,17 +676,6 @@ item.save()  # This gives the item an 'id' and a 'changekey' value
 item.save(send_meeting_invitations=SEND_ONLY_TO_ALL)
 # Update a field. All fields have a corresponding Python type that must be used.
 item.subject = 'bar'
-```
-
-Print all available fields on the 'CalendarItem' class. Beware that some
-fields are read-only, or read-only after the item has been saved or sent, and
-some fields are not supported on old versions of Exchange.
-
-```python
-from exchangelib.items import SEND_ONLY_TO_ALL, SEND_ONLY_TO_CHANGED
-from exchangelib.properties import DistinguishedFolderId
-
-print(CalendarItem.FIELDS)
 item.save()  # When the items has an item_id, this will update the item
 # Only updates certain fields. Accepts a list of field names.
 item.save(update_fields=['subject'])
@@ -707,10 +694,18 @@ item.archive(DistinguishedFolderId('inbox'))
 item.mark_as_junk(is_junk=True, move_item=True)
 ```
 
+Here's how to print all available fields on the `CalendarItem` class. Beware
+that some fields are read-only, or read-only after the item has been saved or
+sent, and some fields are not supported on old versions of Exchange.
+
+```python
+print(CalendarItem.FIELDS)
+```
+
 You can also send emails. If you don't want a local copy:
 
 ```python
-from exchangelib import Message, Mailbox, FileAttachment, HTMLBody
+from exchangelib import Message, Mailbox
 
 m = Message(
     account=a,
@@ -764,6 +759,8 @@ m.forward(
 You can also edit a draft of a reply or forward
 
 ```python
+from exchangelib import FileAttachment
+
 forward_draft = m.create_forward(
     subject='Fwd: Daily motivation',
     body='Hey, look at this!',
@@ -781,6 +778,8 @@ EWS distinguishes between plain text and HTML body contents. If you want to
 send HTML body content, use the HTMLBody helper. Clients will see this as HTML
 and display the body correctly:
 ```python
+from exchangelib import HTMLBody
+
 item.body = HTMLBody(
   '<html><body>Hello happy <blink>OWA user!</blink></body></html>'
 )

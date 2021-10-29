@@ -237,6 +237,7 @@ class ErrorChangeKeyRequired(ResponseMessageError): pass
 class ErrorChangeKeyRequiredForWriteOperations(ResponseMessageError): pass
 class ErrorClientDisconnected(ResponseMessageError): pass
 class ErrorConnectionFailed(ResponseMessageError): pass
+class ErrorConnectionFailedTransientError(ResponseMessageError): pass
 class ErrorContainsFilterWrongType(ResponseMessageError): pass
 class ErrorContentConversionFailed(ResponseMessageError): pass
 class ErrorCorruptData(ResponseMessageError): pass
@@ -2136,6 +2137,27 @@ This exception is for those cases. The caller may want to do something with the 
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class ErrorConnectionFailed(ResponseMessageError): pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="exchangelib.errors.ResponseMessageError" href="#exchangelib.errors.ResponseMessageError">ResponseMessageError</a></li>
+<li><a title="exchangelib.errors.TransportError" href="#exchangelib.errors.TransportError">TransportError</a></li>
+<li><a title="exchangelib.errors.EWSError" href="#exchangelib.errors.EWSError">EWSError</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="exchangelib.errors.ErrorConnectionFailedTransientError"><code class="flex name class">
+<span>class <span class="ident">ErrorConnectionFailedTransientError</span></span>
+<span>(</span><span>value)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Global error type within this module.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class ErrorConnectionFailedTransientError(ResponseMessageError): pass</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -9080,6 +9102,7 @@ This exception is for those cases. The caller may want to do something with the 
 <li><a title="exchangelib.errors.ErrorChangeKeyRequiredForWriteOperations" href="#exchangelib.errors.ErrorChangeKeyRequiredForWriteOperations">ErrorChangeKeyRequiredForWriteOperations</a></li>
 <li><a title="exchangelib.errors.ErrorClientDisconnected" href="#exchangelib.errors.ErrorClientDisconnected">ErrorClientDisconnected</a></li>
 <li><a title="exchangelib.errors.ErrorConnectionFailed" href="#exchangelib.errors.ErrorConnectionFailed">ErrorConnectionFailed</a></li>
+<li><a title="exchangelib.errors.ErrorConnectionFailedTransientError" href="#exchangelib.errors.ErrorConnectionFailedTransientError">ErrorConnectionFailedTransientError</a></li>
 <li><a title="exchangelib.errors.ErrorContainsFilterWrongType" href="#exchangelib.errors.ErrorContainsFilterWrongType">ErrorContainsFilterWrongType</a></li>
 <li><a title="exchangelib.errors.ErrorContentConversionFailed" href="#exchangelib.errors.ErrorContentConversionFailed">ErrorContentConversionFailed</a></li>
 <li><a title="exchangelib.errors.ErrorCorruptData" href="#exchangelib.errors.ErrorCorruptData">ErrorCorruptData</a></li>
@@ -9783,6 +9806,9 @@ This exception is for those cases. The caller may want to do something with the 
 </li>
 <li>
 <h4><code><a title="exchangelib.errors.ErrorConnectionFailed" href="#exchangelib.errors.ErrorConnectionFailed">ErrorConnectionFailed</a></code></h4>
+</li>
+<li>
+<h4><code><a title="exchangelib.errors.ErrorConnectionFailedTransientError" href="#exchangelib.errors.ErrorConnectionFailedTransientError">ErrorConnectionFailedTransientError</a></code></h4>
 </li>
 <li>
 <h4><code><a title="exchangelib.errors.ErrorContainsFilterWrongType" href="#exchangelib.errors.ErrorContainsFilterWrongType">ErrorContainsFilterWrongType</a></code></h4>
