@@ -19,11 +19,10 @@ from ..errors import EWSWarning, TransportError, SOAPError, ErrorTimeoutExpired,
     ErrorCannotEmptyFolder, ErrorDeleteDistinguishedFolder, ErrorInvalidSubscription, ErrorInvalidWatermark, \
     ErrorInvalidSyncStateData, ErrorNameResolutionNoResults, ErrorNameResolutionMultipleResults, \
     ErrorConnectionFailedTransientError, ErrorExceededSubscriptionCount, ErrorExpiredSubscription, \
-    ErrorInvalidPullSubscriptionId, ErrorInvalidPushSubscriptionUrl, ErrorInvalidSubscription, \
-    ErrorInvalidSubscriptionRequest, ErrorProxiedSubscriptionCallFailure, ErrorSubscriptionAccessDenied, \
-    ErrorSubscriptionDelegateAccessNotSupported, ErrorSubscriptionNotFound, ErrorSubscriptionUnsubscribed, \
-    ErrorNewEventStreamConnectionOpened, ErrorReadEventsFailed, ErrorMissedNotificationEvents, \
-    ErrorProxyRequestNotAllowed
+    ErrorInvalidPullSubscriptionId, ErrorInvalidPushSubscriptionUrl, ErrorInvalidSubscriptionRequest, \
+    ErrorProxiedSubscriptionCallFailure, ErrorSubscriptionAccessDenied, ErrorSubscriptionDelegateAccessNotSupported, \
+    ErrorSubscriptionNotFound, ErrorSubscriptionUnsubscribed, ErrorNewEventStreamConnectionOpened, \
+    ErrorReadEventsFailed, ErrorMissedNotificationEvents, ErrorProxyRequestNotAllowed
 from ..properties import FieldURI, IndexedFieldURI, ExtendedFieldURI, ExceptionFieldURI, ItemId
 from ..transport import wrap
 from ..util import chunkify, create_element, add_xml_child, get_xml_attr, to_xml, post_ratelimited, \
@@ -195,9 +194,8 @@ class EWSService(metaclass=abc.ABCMeta):
         if self.prefer_affinity or hasattr(self.account, "backend_affinity"):
             # https://docs.microsoft.com/en-us/exchange/client-developer/exchange-web-services/how-to-maintain-affinity-between-group-of-subscriptions-and-mailbox-server
             headers['X-PreferServerAffinity'] = 'True'
-            if 'X-BackEndOverrideCookie' not in session.cookies:
-                if hasattr(self.account, "backend_affinity"):
-                    session.cookies["X-BackEndOverrideCookie"] = self.account.backend_affinity
+            if 'X-BackEndOverrideCookie' not in session.cookies and hasattr(self.account, "backend_affinity"):
+                session.cookies["X-BackEndOverrideCookie"] = self.account.backend_affinity
         return headers
 
     @property

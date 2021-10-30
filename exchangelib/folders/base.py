@@ -5,8 +5,9 @@ from operator import attrgetter
 
 from .collections import FolderCollection, SyncCompleted
 from .queryset import SingleFolderQuerySet, SHALLOW as SHALLOW_FOLDERS, DEEP as DEEP_FOLDERS
-from ..errors import ErrorAccessDenied, ErrorFolderNotFound, ErrorCannotEmptyFolder, ErrorCannotDeleteObject, \
-    ErrorDeleteDistinguishedFolder, ErrorInvalidSubscription, ErrorNoPublicFolderReplicaAvailable, ErrorItemNotFound
+from ..errors import SubscriptionMessageError, ErrorAccessDenied, ErrorFolderNotFound, ErrorCannotEmptyFolder, \
+    ErrorCannotDeleteObject, ErrorDeleteDistinguishedFolder, ErrorInvalidSubscription, \
+    ErrorNoPublicFolderReplicaAvailable, ErrorItemNotFound
 from ..fields import IntegerField, CharField, FieldPath, EffectiveRightsField, PermissionSetField, EWSElementField, \
     Field, IdElementField, InvalidField
 from ..items import CalendarItem, RegisterMixIn, ITEM_CLASSES, DELETE_TYPE_CHOICES, HARD_DELETE, \

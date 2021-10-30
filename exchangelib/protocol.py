@@ -151,7 +151,7 @@ class BaseProtocol:
         # Create a single session and insert it into the pool. We need to protect this with a lock while we are changing
         # the pool size variable, to avoid race conditions. We must not exceed the pool size limit.
         if self._session_pool_maxsize > 0 and self._session_pool_size == self._session_pool_maxsize:
-                raise SessionPoolMaxSizeReached('Session pool size cannot be increased further')
+            raise SessionPoolMaxSizeReached('Session pool size cannot be increased further')
         with self._session_pool_lock:
             if self._session_pool_maxsize > 0 and self._session_pool_size >= self._session_pool_maxsize:
                 log.debug('Session pool size was increased in another thread')
