@@ -655,7 +655,7 @@ class BaseFolder(RegisterMixIn, SearchableMixIn, metaclass=EWSMeta):
             if not notification.more_events:
                 break
 
-    def get_streaming_events(self, subscription_id, connection_timeout=1, max_notifications_returned=None):
+    def get_streaming_events(self, subscription_ids, connection_timeout=1, max_notifications_returned=None):
         """Get events since the subscription was created, in streaming mode. This method will block as many minutes
         as specified by 'connection_timeout'.
 
@@ -672,7 +672,7 @@ class BaseFolder(RegisterMixIn, SearchableMixIn, metaclass=EWSMeta):
         request_timeout = connection_timeout*60 + 60
         svc = GetStreamingEvents(account=self.account, timeout=request_timeout)
         for i, notification in enumerate(
-                svc.call(subscription_ids=[subscription_id], connection_timeout=connection_timeout),
+                svc.call(subscription_ids=subscription_ids, connection_timeout=connection_timeout),
                 start=1
         ):
             yield notification
