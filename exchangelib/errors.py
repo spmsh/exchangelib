@@ -239,7 +239,7 @@ class ErrorDuplicateSOAPHeader(ResponseMessageError): pass
 class ErrorDuplicateUserIdsSpecified(ResponseMessageError): pass
 class ErrorEmailAddressMismatch(ResponseMessageError): pass
 class ErrorEventNotFound(ResponseMessageError): pass
-class ErrorExceededConnectionCount(ResponseMessageError): pass
+class ErrorExceededConnectionCount(SubscriptionMessageError): pass
 class ErrorExceededFindCountLimit(ResponseMessageError): pass
 class ErrorExceededSubscriptionCount(SubscriptionMessageError): pass
 class ErrorExpiredSubscription(SubscriptionMessageError): pass
@@ -372,7 +372,7 @@ class ErrorInvalidUserPrincipalName(ResponseMessageError): pass
 class ErrorInvalidUserSid(ResponseMessageError): pass
 class ErrorInvalidUserSidMissingUPN(ResponseMessageError): pass
 class ErrorInvalidValueForProperty(ResponseMessageError): pass
-class ErrorInvalidWatermark(ResponseMessageError): pass
+class ErrorInvalidWatermark(SubscriptionMessageError): pass
 class ErrorIPGatewayNotFound(ResponseMessageError): pass
 class ErrorIrresolvableConflict(ResponseMessageError): pass
 class ErrorItemCorrupt(ResponseMessageError): pass
@@ -404,7 +404,7 @@ class ErrorMessageTrackingTransientError(ResponseMessageError): pass
 class ErrorMimeContentConversionFailed(ResponseMessageError): pass
 class ErrorMimeContentInvalid(ResponseMessageError): pass
 class ErrorMimeContentInvalidBase64String(ResponseMessageError): pass
-class ErrorMissedNotificationEvents(ResponseMessageError): pass
+class ErrorMissedNotificationEvents(SubscriptionMessageError): pass
 class ErrorMissingArgument(ResponseMessageError): pass
 class ErrorMissingEmailAddress(ResponseMessageError): pass
 class ErrorMissingEmailAddressForManagedFolder(ResponseMessageError): pass
@@ -456,7 +456,7 @@ class ErrorPropertyValidationFailure(ResponseMessageError): pass
 class ErrorProxiedSubscriptionCallFailure(SubscriptionMessageError): pass
 class ErrorProxyCallFailed(ResponseMessageError): pass
 class ErrorProxyGroupSidLimitExceeded(ResponseMessageError): pass
-class ErrorProxyRequestNotAllowed(ResponseMessageError): pass
+class ErrorProxyRequestNotAllowed(SubscriptionMessageError): pass
 class ErrorProxyRequestProcessingFailed(ResponseMessageError): pass
 class ErrorProxyServiceDiscoveryFailed(ResponseMessageError): pass
 class ErrorProxyTokenExpired(ResponseMessageError): pass
@@ -572,7 +572,7 @@ ERRORS_NOTIFICATIONS_RELATED = (
     ErrorMissedNotificationEvents,
     ErrorProxyRequestNotAllowed,
     ErrorReadEventsFailed,
-    ErrorServerBusy,
+    # ErrorServerBusy,
     # ServiceLocalException,
     # ServiceResponseException,
     # Plus some others which return a subscription id
