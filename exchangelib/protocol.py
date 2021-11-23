@@ -35,7 +35,6 @@ def close_connections():
 
 class BaseProtocol:
     """Base class for Protocol which implements the bare essentials."""
-
     # The maximum number of sessions (== TCP connections, see below) we will open to this service endpoint. Keep this
     # low unless you have an agreement with the Exchange admin on the receiving end to hammer the server and
     # rate-limiting policies have been disabled for the connecting user. Changing this setting only makes sense if
@@ -150,10 +149,10 @@ class BaseProtocol:
         """Increases the session pool size. We increase by one session per call."""
         # Create a single session and insert it into the pool. We need to protect this with a lock while we are changing
         # the pool size variable, to avoid race conditions. We must not exceed the pool size limit.
-        if self._session_pool_maxsize > 0 and self._session_pool_size == self._session_pool_maxsize:
+        if self._session_pool_maxsize and self._session_pool_size == self._session_pool_maxsize:
             raise SessionPoolMaxSizeReached('Session pool size cannot be increased further')
         with self._session_pool_lock:
-            if self._session_pool_maxsize > 0 and self._session_pool_size >= self._session_pool_maxsize:
+            if self._session_pool_size >= self._session_pool_maxsize:
                 log.debug('Session pool size was increased in another thread')
                 return
             log.debug('Server %s: Increasing session pool size from %s to %s', self.server, self._session_pool_size,
@@ -173,8 +172,6 @@ class BaseProtocol:
             if self._session_pool_size <= 1:
                 log.debug('Session pool size was decreased in another thread')
                 return
-            log.warning('Server %s: Decreasing session pool size from %s to %s', self.server, self._session_pool_size,
-                        self._session_pool_size - 1)
             session = self.get_session()
             self.close_session(session)
             self._session_pool_size -= 1
@@ -185,11 +182,7 @@ class BaseProtocol:
 
         # add unlimited session
         if self._session_pool_maxsize == 0:
-            self.increase_poolsize()
-            session = self._session_pool.get()
-            log.debug('Server %s: Got session %s - %s', self.server, session.session_id, self._session_pool_size)
-            session.usage_count += 1
-            return session
+            return self.create_session()
 
         _timeout = 60  # Rate-limit messages about session starvation
         try:
@@ -214,15 +207,17 @@ class BaseProtocol:
 
     def release_session(self, session):
         # This should never fail, as we don't have more sessions than the queue contains
-        log.debug('Server %s: Releasing session %s', self.server, session.session_id)
-        if self.MAX_SESSION_USAGE_COUNT and session.usage_count >= self.MAX_SESSION_USAGE_COUNT:
-            log.debug('Server %s: session %s usage exceeded limit. Discarding', self.server, session.session_id)
-            self._session_pool_size -= 1
-            session = self.renew_session(session)
-        try:
-            self._session_pool.put(session, block=False)
-        except Full:
-            log.debug('Server %s: Session pool was already full %s', self.server, session.session_id)
+        if self._session_pool_maxsize == 0:
+            self.retire_session(session)
+        else:
+            log.debug('Server %s: Releasing session %s', self.server, session.session_id)
+            if self.MAX_SESSION_USAGE_COUNT and session.usage_count > self.MAX_SESSION_USAGE_COUNT:
+                log.debug('Server %s: session %s usage exceeded limit. Discarding', self.server, session.session_id)
+                session = self.renew_session(session)
+            try:
+                self._session_pool.put(session, block=False)
+            except Full:
+                log.debug('Server %s: Session pool was already full %s', self.server, session.session_id)
 
     @staticmethod
     def close_session(session):
@@ -233,7 +228,8 @@ class BaseProtocol:
         # The session is useless. Close it completely and place a fresh session in the pool
         log.debug('Server %s: Retiring session %s', self.server, session.session_id)
         self.close_session(session)
-        self.release_session(self.create_session())
+        if self._session_pool_maxsize and self._session_pool_maxsize >= 1:
+            self.release_session(self.create_session())
 
     def renew_session(self, session):
         # The session is useless. Close it completely and place a fresh session in the pool
@@ -286,7 +282,6 @@ class BaseProtocol:
         session.session_id = sum(map(ord, str(os.urandom(100))))  # Used for debugging messages in services
         session.usage_count = 0
         session.protocol = self
-        log.debug('Server %s: Created session %s', self.server, session.session_id)
         return session
 
     def create_oauth2_session(self):
