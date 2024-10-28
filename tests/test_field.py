@@ -1,12 +1,8 @@
 import datetime
 import warnings
+import zoneinfo
 from collections import namedtuple
 from decimal import Decimal
-
-try:
-    import zoneinfo
-except ImportError:
-    from backports import zoneinfo
 
 from exchangelib.extended_properties import ExternId
 from exchangelib.fields import (

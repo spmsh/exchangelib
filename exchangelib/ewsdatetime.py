@@ -1,10 +1,6 @@
 import datetime
 import logging
-
-try:
-    import zoneinfo
-except ImportError:
-    from backports import zoneinfo
+import zoneinfo
 
 import tzlocal
 
@@ -283,7 +279,6 @@ class EWSTimeZone(zoneinfo.ZoneInfo):
         try:
             return {
                 cls.__module__.split(".")[0]: lambda z: z,
-                "backports": cls.from_zoneinfo,
                 "datetime": cls.from_datetime,
                 "dateutil": cls.from_dateutil,
                 "pytz": cls.from_pytz,

@@ -5,16 +5,12 @@ import string
 import time
 import unittest
 import unittest.util
+import zoneinfo
 from collections import namedtuple
 from decimal import Decimal
 from pathlib import Path
 
 from yaml import safe_load
-
-try:
-    import zoneinfo
-except ImportError:
-    from backports import zoneinfo
 
 from exchangelib.account import Account, Identity
 from exchangelib.attachments import FileAttachment

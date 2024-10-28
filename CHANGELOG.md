@@ -3,6 +3,7 @@ Change Log
 
 HEAD
 ----
+- Dropped support for Python 3.8 which is EOL per October 7, 2024.
 
 
 5.4.3

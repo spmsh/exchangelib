@@ -1,9 +1,5 @@
 import datetime
-
-try:
-    import zoneinfo
-except ImportError:
-    from backports import zoneinfo
+import zoneinfo
 
 from exchangelib.errors import ErrorInvalidIdMalformed
 from exchangelib.folders import Contacts

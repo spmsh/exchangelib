@@ -4,13 +4,9 @@ import pickle
 import socket
 import tempfile
 import warnings
+import zoneinfo
 from contextlib import suppress
 from unittest.mock import Mock, patch
-
-try:
-    import zoneinfo
-except ImportError:
-    from backports import zoneinfo
 
 import psutil
 import requests_mock

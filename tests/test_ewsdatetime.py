@@ -1,14 +1,10 @@
 import datetime
 import unittest
+import zoneinfo
 
 import dateutil.tz
 import pytz
 import requests_mock
-
-try:
-    import zoneinfo
-except ImportError:
-    from backports import zoneinfo
 
 from exchangelib.errors import NaiveDateTimeNotAllowed, UnknownTimeZone
 from exchangelib.ewsdatetime import UTC, EWSDate, EWSDateTime, EWSTimeZone

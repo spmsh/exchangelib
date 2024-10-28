@@ -106,9 +106,9 @@ __all__ = [
     "discover",
 ]
 
-# Set a default user agent, e.g. "exchangelib/3.1.1 (python-requests/2.22.0)"
 import requests.utils
 
+# Set a default user agent, e.g. "exchangelib/5.4.3 (python-requests/2.31.0)"
 BaseProtocol.USERAGENT = f"{__name__}/{__version__} ({requests.utils.default_user_agent()})"
 
 

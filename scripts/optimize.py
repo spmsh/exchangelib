@@ -5,12 +5,8 @@ import copy
 import datetime
 import logging
 import time
+import zoneinfo
 from pathlib import Path
-
-try:
-    import zoneinfo
-except ImportError:
-    from backports import zoneinfo
 
 from yaml import safe_load
 
