@@ -64,7 +64,7 @@ from .settings import OofSettings
 from .transport import BASIC, CBA, DIGEST, GSSAPI, NTLM, OAUTH2, SSPI
 from .version import Build, Version
 
-__version__ = &#34;5.4.3&#34;
+__version__ = &#34;5.5.0&#34;
 
 __all__ = [
     &#34;AcceptItem&#34;,
@@ -134,9 +134,9 @@ __all__ = [
     &#34;discover&#34;,
 ]
 
-# Set a default user agent, e.g. &#34;exchangelib/3.1.1 (python-requests/2.22.0)&#34;
 import requests.utils
 
+# Set a default user agent, e.g. &#34;exchangelib/5.4.3 (python-requests/2.31.0)&#34;
 BaseProtocol.USERAGENT = f&#34;{__name__}/{__version__} ({requests.utils.default_user_agent()})&#34;
 
 
@@ -6124,7 +6124,6 @@ services.GetServerTimeZones.</p></div>
         try:
             return {
                 cls.__module__.split(&#34;.&#34;)[0]: lambda z: z,
-                &#34;backports&#34;: cls.from_zoneinfo,
                 &#34;datetime&#34;: cls.from_datetime,
                 &#34;dateutil&#34;: cls.from_dateutil,
                 &#34;pytz&#34;: cls.from_pytz,
@@ -6256,7 +6255,6 @@ def from_timezone(cls, tz):
     try:
         return {
             cls.__module__.split(&#34;.&#34;)[0]: lambda z: z,
-            &#34;backports&#34;: cls.from_zoneinfo,
             &#34;datetime&#34;: cls.from_datetime,
             &#34;dateutil&#34;: cls.from_dateutil,
             &#34;pytz&#34;: cls.from_pytz,
@@ -10266,6 +10264,9 @@ tokens for the given user. This allows the app to act as the signed-in user.</p>
                 raise ValueError(&#34;&#39;start&#39; must be before &#39;end&#39;&#34;)
             if self.end &lt; datetime.datetime.now(tz=UTC):
                 raise ValueError(&#34;&#39;end&#39; must be in the future&#34;)
+            # Some servers only like UTC timestamps
+            self.start = self.start.astimezone(UTC)
+            self.end = self.end.astimezone(UTC)
         if self.state != self.DISABLED and (not self.internal_reply or not self.external_reply):
             raise ValueError(f&#34;&#39;internal_reply&#39; and &#39;external_reply&#39; must be set when state is not {self.DISABLED!r}&#34;)
 
@@ -10420,6 +10421,9 @@ def from_xml(cls, elem, account):
             raise ValueError(&#34;&#39;start&#39; must be before &#39;end&#39;&#34;)
         if self.end &lt; datetime.datetime.now(tz=UTC):
             raise ValueError(&#34;&#39;end&#39; must be in the future&#34;)
+        # Some servers only like UTC timestamps
+        self.start = self.start.astimezone(UTC)
+        self.end = self.end.astimezone(UTC)
     if self.state != self.DISABLED and (not self.internal_reply or not self.external_reply):
         raise ValueError(f&#34;&#39;internal_reply&#39; and &#39;external_reply&#39; must be set when state is not {self.DISABLED!r}&#34;)</code></pre>
 </details>

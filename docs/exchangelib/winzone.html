@@ -30,6 +30,11 @@
 <pre><code class="python">&#34;&#34;&#34;A dict to translate from IANA location name to Windows timezone name. Translations taken from CLDR_WINZONE_URL
 &#34;&#34;&#34;
 
+# Data taken from https://github.com/unicode-org/cldr/blob/main/common/supplemental/windowsZones.xml
+# SPDX-FileCopyrightText: Copyright © 1991-2013 Unicode, Inc.
+# SPDX-License-Identifier: Unicode-3.0
+# See https://www.unicode.org/license.txt for the license text.
+
 import re
 
 import requests
@@ -293,7 +298,6 @@ CLDR_TO_MS_TIMEZONE_MAP = {
     &#34;Asia/Brunei&#34;: (&#34;Singapore Standard Time&#34;, &#34;BN&#34;),
     &#34;Asia/Calcutta&#34;: (&#34;India Standard Time&#34;, &#34;001&#34;),
     &#34;Asia/Chita&#34;: (&#34;Transbaikal Standard Time&#34;, &#34;001&#34;),
-    &#34;Asia/Choibalsan&#34;: (&#34;Ulaanbaatar Standard Time&#34;, &#34;MN&#34;),
     &#34;Asia/Colombo&#34;: (&#34;Sri Lanka Standard Time&#34;, &#34;001&#34;),
     &#34;Asia/Damascus&#34;: (&#34;Syria Standard Time&#34;, &#34;001&#34;),
     &#34;Asia/Dhaka&#34;: (&#34;Bangladesh Standard Time&#34;, &#34;001&#34;),
@@ -545,6 +549,7 @@ IANA_TO_MS_TIMEZONE_MAP = dict(
         &#34;Antarctica/South_Pole&#34;: CLDR_TO_MS_TIMEZONE_MAP[&#34;Pacific/Auckland&#34;],
         &#34;Antarctica/Troll&#34;: CLDR_TO_MS_TIMEZONE_MAP[&#34;Europe/Oslo&#34;],
         &#34;Asia/Ashkhabad&#34;: CLDR_TO_MS_TIMEZONE_MAP[&#34;Asia/Ashgabat&#34;],
+        &#34;Asia/Choibalsan&#34;: CLDR_TO_MS_TIMEZONE_MAP[&#34;Asia/Ulaanbaatar&#34;],
         &#34;Asia/Chongqing&#34;: CLDR_TO_MS_TIMEZONE_MAP[&#34;Asia/Shanghai&#34;],
         &#34;Asia/Chungking&#34;: CLDR_TO_MS_TIMEZONE_MAP[&#34;Asia/Shanghai&#34;],
         &#34;Asia/Dacca&#34;: CLDR_TO_MS_TIMEZONE_MAP[&#34;Asia/Dhaka&#34;],

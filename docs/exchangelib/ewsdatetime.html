@@ -28,11 +28,7 @@
 </summary>
 <pre><code class="python">import datetime
 import logging
-
-try:
-    import zoneinfo
-except ImportError:
-    from backports import zoneinfo
+import zoneinfo
 
 import tzlocal
 
@@ -311,7 +307,6 @@ class EWSTimeZone(zoneinfo.ZoneInfo):
         try:
             return {
                 cls.__module__.split(&#34;.&#34;)[0]: lambda z: z,
-                &#34;backports&#34;: cls.from_zoneinfo,
                 &#34;datetime&#34;: cls.from_datetime,
                 &#34;dateutil&#34;: cls.from_dateutil,
                 &#34;pytz&#34;: cls.from_pytz,
@@ -953,7 +948,6 @@ services.GetServerTimeZones.</p></div>
         try:
             return {
                 cls.__module__.split(&#34;.&#34;)[0]: lambda z: z,
-                &#34;backports&#34;: cls.from_zoneinfo,
                 &#34;datetime&#34;: cls.from_datetime,
                 &#34;dateutil&#34;: cls.from_dateutil,
                 &#34;pytz&#34;: cls.from_pytz,
@@ -1085,7 +1079,6 @@ def from_timezone(cls, tz):
     try:
         return {
             cls.__module__.split(&#34;.&#34;)[0]: lambda z: z,
-            &#34;backports&#34;: cls.from_zoneinfo,
             &#34;datetime&#34;: cls.from_datetime,
             &#34;dateutil&#34;: cls.from_dateutil,
             &#34;pytz&#34;: cls.from_pytz,

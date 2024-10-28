@@ -63,6 +63,9 @@ class OofSettings(EWSElement):
                 raise ValueError(&#34;&#39;start&#39; must be before &#39;end&#39;&#34;)
             if self.end &lt; datetime.datetime.now(tz=UTC):
                 raise ValueError(&#34;&#39;end&#39; must be in the future&#34;)
+            # Some servers only like UTC timestamps
+            self.start = self.start.astimezone(UTC)
+            self.end = self.end.astimezone(UTC)
         if self.state != self.DISABLED and (not self.internal_reply or not self.external_reply):
             raise ValueError(f&#34;&#39;internal_reply&#39; and &#39;external_reply&#39; must be set when state is not {self.DISABLED!r}&#34;)
 
@@ -161,6 +164,9 @@ class OofSettings(EWSElement):
                 raise ValueError(&#34;&#39;start&#39; must be before &#39;end&#39;&#34;)
             if self.end &lt; datetime.datetime.now(tz=UTC):
                 raise ValueError(&#34;&#39;end&#39; must be in the future&#34;)
+            # Some servers only like UTC timestamps
+            self.start = self.start.astimezone(UTC)
+            self.end = self.end.astimezone(UTC)
         if self.state != self.DISABLED and (not self.internal_reply or not self.external_reply):
             raise ValueError(f&#34;&#39;internal_reply&#39; and &#39;external_reply&#39; must be set when state is not {self.DISABLED!r}&#34;)
 
@@ -315,6 +321,9 @@ def from_xml(cls, elem, account):
             raise ValueError(&#34;&#39;start&#39; must be before &#39;end&#39;&#34;)
         if self.end &lt; datetime.datetime.now(tz=UTC):
             raise ValueError(&#34;&#39;end&#39; must be in the future&#34;)
+        # Some servers only like UTC timestamps
+        self.start = self.start.astimezone(UTC)
+        self.end = self.end.astimezone(UTC)
     if self.state != self.DISABLED and (not self.internal_reply or not self.external_reply):
         raise ValueError(f&#34;&#39;internal_reply&#39; and &#39;external_reply&#39; must be set when state is not {self.DISABLED!r}&#34;)</code></pre>
 </details>
