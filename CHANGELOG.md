@@ -3,8 +3,12 @@ Change Log
 
 HEAD
 ----
-- Dropped support for Python 3.8 which is EOL per October 7, 2024.
 
+
+5.5.0
+-----
+- Dropped support for Python 3.8 which is EOL per October 7, 2024.
+- Fix setting OOF on servers that only accept UTC timestamps.
 
 5.4.3
 -----
