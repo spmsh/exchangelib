@@ -332,6 +332,21 @@ class CalendarTest(CommonItemTest):
         self.assertEqual(last_occurrence.start, master_item.last_occurrence.start)
         self.assertEqual(last_occurrence.end, master_item.last_occurrence.end)
 
+        # Test that we can update the recurrence and see it reflected in the view
+        print(master_item.recurrence)
+
+        master_item.recurrence.pattern.interval = 2
+        master_item.recurrence.boundary.number = 3
+        master_item.save()
+
+        range_start, range_end = start, end + datetime.timedelta(days=5)
+        unfolded = [i for i in self.test_folder.view(start=range_start, end=range_end) if self.match_cat(i)]
+        self.assertEqual(len(unfolded), 3)
+
+        print(master_item.recurrence)
+        master_item.refresh()
+        print(master_item.recurrence)
+
     def test_change_occurrence(self):
         # Test that we can make changes to individual occurrences and see the effect on the master item.
         start = datetime.datetime(2016, 1, 1, 8, tzinfo=self.account.default_timezone)
