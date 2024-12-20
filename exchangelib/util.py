@@ -19,7 +19,7 @@ import lxml.etree  # nosec
 import requests.exceptions
 from defusedxml.expatreader import DefusedExpatParser
 from defusedxml.sax import _InputSource
-from oauthlib.oauth2 import TokenExpiredError
+from oauthlib.oauth2 import InvalidClientIdError, TokenExpiredError
 from pygments import highlight
 from pygments.formatters.terminal import TerminalFormatter
 from pygments.lexers.html import XmlLexer
@@ -831,7 +831,7 @@ Response XML: %(xml_response)s"""
         protocol.retire_session(session)
         log.debug("Session %s thread %s: connection error POST'ing to %s", session.session_id, thread_id, url)
         raise ErrorTimeoutExpired(f"Reraised from {e.__class__.__name__}({e})")
-    except TokenExpiredError:
+    except (InvalidClientIdError, TokenExpiredError):
         log.debug("Session %s thread %s: OAuth token expired; refreshing", session.session_id, thread_id)
         protocol.release_session(protocol.refresh_credentials(session))
         raise
