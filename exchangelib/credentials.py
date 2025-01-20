@@ -234,12 +234,8 @@ class OAuth2LegacyCredentials(OAuth2Credentials):
 
     def token_params(self):
         res = super().token_params()
-        res.update(
-            {
-                "username": self.username,
-                "password": self.password,
-            }
-        )
+        res["username"] = self.username
+        res["password"] = self.password
         return res
 
     @threaded_cached_property
