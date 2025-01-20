@@ -726,8 +726,8 @@ class DateOrDateTimeField(DateTimeField):
 
     def from_xml(self, elem, account):
         val = self._get_val_from_elem(elem)
-        if val is not None and len(val) == 16:
-            # This is a date format with timezone info, as sent by task recurrences. Eg: '2006-01-09+01:00'
+        if val is not None and len(val) in (11, 16):
+            # This is a date with timezone info, as sent by task recurrences. Eg: '2006-01-09+01:00' or '2006-01-09Z'
             return self._date_field.from_xml(elem=elem, account=account)
         return super().from_xml(elem=elem, account=account)
 

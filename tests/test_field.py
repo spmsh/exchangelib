@@ -13,6 +13,7 @@ from exchangelib.fields import (
     Choice,
     ChoiceField,
     DateField,
+    DateOrDateTimeField,
     DateTimeField,
     DecimalField,
     EnumField,
@@ -208,6 +209,34 @@ MS_TIMEZONE_TO_IANA_MAP['THIS_IS_GARBAGE'] = "Some_Region/Some_Location"
             field.clean("c2", version=Version(EXCHANGE_2007))
         field.clean("c2", version=Version(EXCHANGE_2010))
         field.clean("c2", version=Version(EXCHANGE_2013))
+
+    def test_date_or_datetime_field(self):
+        # Test edge cases with timezone info on date strings
+        tz = zoneinfo.ZoneInfo("Europe/Copenhagen")
+        account = namedtuple("Account", ["default_timezone"])(default_timezone=tz)
+        field = DateOrDateTimeField("foo", field_uri="calendar:Start")
+
+        # TZ-aware date string
+        payload = b"""\
+<?xml version="1.0" encoding="utf-8"?>
+<Envelope xmlns:t="http://schemas.microsoft.com/exchange/services/2006/types">
+    <t:Item>
+        <t:Start>2017-06-21Z</t:Start>
+    </t:Item>
+</Envelope>"""
+        elem = to_xml(payload).find(f"{{{TNS}}}Item")
+        self.assertEqual(field.from_xml(elem=elem, account=account), datetime.datetime(2017, 6, 21))
+
+        # TZ-aware date string
+        payload = b"""\
+<?xml version="1.0" encoding="utf-8"?>
+<Envelope xmlns:t="http://schemas.microsoft.com/exchange/services/2006/types">
+    <t:Item>
+        <t:Start>2017-06-21+01:00</t:Start>
+     </t:Item>
+</Envelope>"""
+        elem = to_xml(payload).find(f"{{{TNS}}}Item")
+        self.assertEqual(field.from_xml(elem=elem, account=account), datetime.date(2017, 6, 21))
 
     def test_naive_datetime(self):
         # Test that we can survive naive datetimes on a datetime field
