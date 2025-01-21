@@ -169,8 +169,8 @@ class MessagesTest(CommonItemTest):
         self.assertEqual(self.account.sent.filter(subject=new_subject).count(), 1)
 
     def test_mark_as_junk(self):
-        # Test that we can mark a Message item as junk and non-junk, and that the message goes to the junk forlder and
-        # back to the the inbox.
+        # Test that we can mark a Message item as junk and non-junk, and that the message goes to the junk folder and
+        # back to the inbox.
         item = self.get_test_item().save()
         item.mark_as_junk(is_junk=False, move_item=False)
         self.assertEqual(item.folder, self.test_folder)

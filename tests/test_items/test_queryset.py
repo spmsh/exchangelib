@@ -1,6 +1,6 @@
 import time
 
-from exchangelib.errors import ErrorItemNotFound
+from exchangelib.errors import ErrorInternalServerError, ErrorItemNotFound
 from exchangelib.folders import FolderCollection, Inbox
 from exchangelib.items import ASSOCIATED, SHALLOW, Message
 from exchangelib.queryset import DoesNotExist, MultipleObjectsReturned, QuerySet
@@ -333,9 +333,18 @@ class ItemQuerySetTest(BaseItemTest):
         self.get_test_item().save()
         qs = self.test_folder.filter(categories__contains=self.categories)
         to_folder = self.account.trash
-        qs.archive(to_folder=to_folder)
-        self.assertEqual(qs.count(), 0)
-        self.assertEqual(to_folder.filter(categories__contains=self.categories).count(), 1)
+        try:
+            qs.archive(to_folder=to_folder)
+            self.assertEqual(qs.count(), 0)
+            self.assertEqual(to_folder.filter(categories__contains=self.categories).count(), 1)
+        except ErrorInternalServerError as e:
+            # O365 is apparently unable to archive anymore
+            self.assertEqual(
+                str(e),
+                "An internal server error occurred. The operation failed., Unable to cast object of type "
+                "'Microsoft.Exchange.Services.Core.Types.MoveItemRequest' to type "
+                "'Microsoft.Exchange.Services.Core.ILegacyServiceCommandFactory'.",
+            )
 
     def test_depth(self):
         self.assertGreaterEqual(self.test_folder.all().depth(ASSOCIATED).count(), 0)

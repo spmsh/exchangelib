@@ -873,8 +873,17 @@ class GenericItemTest(CommonItemTest):
 
     def test_archive(self):
         item = self.get_test_item(folder=self.test_folder).save()
-        item_id, changekey = item.archive(to_folder=self.account.trash)
-        self.account.root.get(id=item_id, changekey=changekey)
+        try:
+            item_id, changekey = item.archive(to_folder=self.account.trash)
+            self.account.root.get(id=item_id, changekey=changekey)
+        except ErrorInternalServerError as e:
+            # O365 is apparently unable to archive anymore
+            self.assertEqual(
+                str(e),
+                "An internal server error occurred. The operation failed., Unable to cast object of type "
+                "'Microsoft.Exchange.Services.Core.Types.MoveItemRequest' to type "
+                "'Microsoft.Exchange.Services.Core.ILegacyServiceCommandFactory'.",
+            )
 
     def test_item_attachments(self):
         item = self.get_test_item(folder=self.test_folder)
