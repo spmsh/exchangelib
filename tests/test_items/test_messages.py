@@ -19,15 +19,25 @@ class MessagesTest(CommonItemTest):
     FOLDER_CLASS = Inbox
     ITEM_CLASS = Message
     INCOMING_MESSAGE_TIMEOUT = 60
+    AQS_INDEXING_TIMEOUT = 60
 
     def get_incoming_message(self, subject):
         t1 = time.monotonic()
         while True:
-            t2 = time.monotonic()
-            if t2 - t1 > self.INCOMING_MESSAGE_TIMEOUT:
+            if time.monotonic() - t1 > self.INCOMING_MESSAGE_TIMEOUT:
                 self.skipTest(f"Too bad. Gave up in {self.id()} waiting for the incoming message to show up")
             try:
                 return self.account.inbox.get(subject=subject)
+            except DoesNotExist:
+                time.sleep(5)
+
+    def wait_for_aqs_indexing(self, folder, aqs_filter):
+        t1 = time.monotonic()
+        while True:
+            if time.monotonic() - t1 > self.AQS_INDEXING_TIMEOUT:
+                self.skipTest(f"Too bad. Gave up in {self.id()} waiting for the AQS indexing to complete")
+            try:
+                return folder.get(aqs_filter)
             except DoesNotExist:
                 time.sleep(5)
 
@@ -227,3 +237,18 @@ class MessagesTest(CommonItemTest):
         item = self.get_test_item()
         with self.assertRaises(AttributeError):
             item.send(copy_to_folder=self.account.trash, save_copy=False)  # Inconsistent args
+
+    def test_filter_with_aqs(self):
+        # Test AQS filtering on subject and recipients
+        item = self.get_test_item(folder=None)
+        item.send_and_save()
+        sent_item = self.account.sent.get(subject=item.subject)
+        subject = sent_item.subject.strip(' :"')  # Remove special chars to not interfere with AQS syntax
+        to_email = sent_item.to_recipients[0].email_address
+        to_name = sent_item.to_recipients[0].name
+        self.wait_for_aqs_indexing(self.account.sent, f"Subject:{subject}")
+        self.assertEqual(self.account.sent.get(f"Subject:{subject}").id, sent_item.id)
+        self.assertEqual(self.account.sent.get(f"To:{to_email} AND Subject:{subject}").id, sent_item.id)
+        self.assertEqual(self.account.sent.get(f"To:{to_name} AND Subject:{subject}").id, sent_item.id)
+        self.assertEqual(self.account.sent.get(f'To:"{to_name}" AND Subject:{subject}').id, sent_item.id)
+        self.assertEqual(self.account.sent.get(f"Participants:{to_name} AND Subject:{subject}").id, sent_item.id)
