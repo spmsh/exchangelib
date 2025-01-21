@@ -225,7 +225,7 @@ MS_TIMEZONE_TO_IANA_MAP['THIS_IS_GARBAGE'] = "Some_Region/Some_Location"
     </t:Item>
 </Envelope>"""
         elem = to_xml(payload).find(f"{{{TNS}}}Item")
-        self.assertEqual(field.from_xml(elem=elem, account=account), datetime.datetime(2017, 6, 21))
+        self.assertEqual(field.from_xml(elem=elem, account=account), datetime.date(2017, 6, 21))
 
         # TZ-aware date string
         payload = b"""\
