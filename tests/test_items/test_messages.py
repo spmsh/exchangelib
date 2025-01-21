@@ -242,13 +242,23 @@ class MessagesTest(CommonItemTest):
         # Test AQS filtering on subject and recipients
         item = self.get_test_item(folder=None)
         item.send_and_save()
+        subject = item.subject.strip(' :"')  # Remove special chars to not interfere with AQS syntax
         sent_item = self.account.sent.get(subject=item.subject)
-        subject = sent_item.subject.strip(' :"')  # Remove special chars to not interfere with AQS syntax
         to_email = sent_item.to_recipients[0].email_address
         to_name = sent_item.to_recipients[0].name
         self.wait_for_aqs_indexing(self.account.sent, f"Subject:{subject}")
-        self.assertEqual(self.account.sent.get(f"Subject:{subject}").id, sent_item.id)
         self.assertEqual(self.account.sent.get(f"To:{to_email} AND Subject:{subject}").id, sent_item.id)
         self.assertEqual(self.account.sent.get(f"To:{to_name} AND Subject:{subject}").id, sent_item.id)
         self.assertEqual(self.account.sent.get(f'To:"{to_name}" AND Subject:{subject}').id, sent_item.id)
         self.assertEqual(self.account.sent.get(f"Participants:{to_name} AND Subject:{subject}").id, sent_item.id)
+        self.assertEqual(self.account.sent.get(f"Subject:{subject}").id, sent_item.id)
+
+        # Test AQS search index cache invalidation. We should be able to find a second item with the same subject,
+        # using the same search string as before.
+        item2 = self.get_test_item(folder=None)
+        item2.subject = item.subject
+        self.assertNotEqual(item.references, item2.references)
+        item2.send_and_save()
+        body = item2.body[:100].strip(' :"')  # Remove special chars to not interfere with AQS syntax
+        self.wait_for_aqs_indexing(self.account.sent, f"Body:{body}")
+        self.assertEqual(self.account.sent.filter(f"Subject:{subject}").count(), 2)
