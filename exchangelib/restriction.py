@@ -5,7 +5,7 @@ from copy import copy
 from .errors import InvalidEnumValue
 from .fields import DateTimeBackedDateField, FieldPath, InvalidField
 from .util import create_element, is_iterable, value_to_xml_text, xml_to_str
-from .version import EXCHANGE_2010
+from .version import EXCHANGE_2010, EXCHANGE_2013
 
 log = logging.getLogger(__name__)
 
@@ -346,7 +346,12 @@ class Q:
             self._check_integrity()
             if version.build < EXCHANGE_2010:
                 raise NotImplementedError("QueryString filtering is only supported for Exchange 2010 servers and later")
-            elem = create_element("m:QueryString")
+            if version.build < EXCHANGE_2013:
+                elem = create_element("m:QueryString")
+            else:
+                elem = create_element(
+                    "m:QueryString", attrs=dict(ResetCache=True, ReturnDeletedItems=False, ReturnHighlightTerms=False)
+                )
             elem.text = self.query_string
             return elem
         # Translate this Q object to a valid Restriction XML tree
